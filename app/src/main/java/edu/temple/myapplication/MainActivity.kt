@@ -16,18 +16,22 @@ import kotlin.concurrent.timer
 class MainActivity : AppCompatActivity() {
 
     lateinit var timerBinder: TimerService.TimerBinder
+    lateinit var  countdownTextView: TextView
     var isConnected = false
 
     val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             timerBinder = service as TimerService.TimerBinder
+            timerBinder!!.setHandler(timerHandler)
             isConnected = true
         }
         override fun onServiceDisconnected(name: ComponentName?) {
             isConnected = false
         }
     }
-    val handler: Handler = Handler(Looper.getMainLooper()){
+
+    val timerHandler = Handler(Looper.getMainLooper()){
+        countdownTextView.text = it.what.toString()
         true
     }
 
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var countdownTextView = findViewById<TextView>(R.id.textView)
+        countdownTextView = findViewById(R.id.textView)
 
         bindService(
             Intent(this, TimerService::class.java),
@@ -68,10 +72,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unbindService(serviceConnection)
-
-    }
-
-    fun updateTextView(textView: TextView){
 
     }
 
