@@ -5,8 +5,13 @@ import android.content.Intent
 import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.widget.Button
+import android.widget.TextView
+import org.w3c.dom.Text
+import kotlin.concurrent.timer
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,12 +27,15 @@ class MainActivity : AppCompatActivity() {
             isConnected = false
         }
     }
+    val handler: Handler = Handler(Looper.getMainLooper()){
+        true
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        var countdownTextView = findViewById<TextView>(R.id.textView)
 
         bindService(
             Intent(this, TimerService::class.java),
@@ -35,17 +43,19 @@ class MainActivity : AppCompatActivity() {
             BIND_AUTO_CREATE
         )
 
+        val startButton = findViewById<Button>(R.id.startButton)
 
-        findViewById<Button>(R.id.startButton).setOnClickListener {
-            if (isConnected){
+        startButton.setOnClickListener {
+            if (isConnected && startButton.text == "Start"){
                 timerBinder.start(100)
+                startButton.text = "Pause"
             }
-            if (timerBinder.isRunning){
+            if (timerBinder.isRunning && startButton.text == "Pause"){
                 timerBinder.pause()
+                startButton.text = "Start"
+
             }
-            else{
-                timerBinder.
-            }
+
         }
         
         findViewById<Button>(R.id.stopButton).setOnClickListener {
@@ -58,6 +68,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unbindService(serviceConnection)
+
+    }
+
+    fun updateTextView(textView: TextView){
 
     }
 
